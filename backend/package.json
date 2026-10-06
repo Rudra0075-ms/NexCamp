@@ -1,0 +1,42 @@
+{
+  "name": "nex-camp-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend for NeX Camp.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/seed/index.js",
+    "seed:fresh": "node src/seed/index.js --fresh",
+    "smoke": "node scripts/smoke.js",
+    "smoke:gatepass": "node scripts/gatepass-smoke.js",
+    "test": "node --test \"test/*.test.js\"",
+    "smoke:ai": "node scripts/ai-smoke.js",
+    "smoke:ops": "node scripts/ops-smoke.js",
+    "seed:ext": "node src/seed/ext/run.js",
+    "smoke:ext": "node scripts/ext-smoke.js",
+    "seed:xo": "node src/seed/xo/run.js",
+    "smoke:xo": "node scripts/xo-smoke.js",
+    "seed:proof": "node src/seed/proof/run.js",
+    "budgets": "node scripts/workflow-budgets.js",
+    "seed:support": "node src/seed/support/run.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0",
+    "qrcode": "^1.5.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

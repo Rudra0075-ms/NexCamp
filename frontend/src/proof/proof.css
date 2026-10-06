@@ -1,0 +1,24 @@
+/* Round 3 — small additions on top of intel.css, ext.css and xo.css. No new colours: tokens only. */
+.pf-section { margin-top: 36px; border-top: 1px solid var(--color-divider); padding-top: 20px; min-width: 0; }
+.pf-kicker { font-size: 11px; color: var(--color-muted); }
+.pf-h2 { font-size: clamp(20px, 2.6vw, 30px); letter-spacing: -.02em; margin: 8px 0 14px; }
+.pf-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.pf-card { border: 1px solid var(--ci-line); border-radius: var(--radius-md); padding: 12px 14px; min-width: 0; overflow-wrap: anywhere; background: var(--color-surface); }
+.pf-card b.pf-num { display: block; font-family: var(--font-heading); font-weight: 800; font-size: clamp(26px, 3.4vw, 38px); line-height: 1; letter-spacing: -.02em; margin: 6px 0; }
+.pf-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.pf-line { border-left: 2px solid var(--ci-line); padding: 6px 10px; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.pf-line.warn { border-left-color: var(--color-warn); }
+.pf-line.block { border-left-color: var(--color-accent); }
+.pf-line.ok { border-left-color: var(--ci-ok); }
+.pf-flow { width: 100%; height: auto; display: block; }
+.pf-flow text { font-family: var(--font-body, Archivo), sans-serif; font-size: 11px; fill: var(--color-text); }
+.pf-flow .pf-edge { cursor: pointer; }
+.pf-flow .pf-edge:focus { outline: none; }
+.pf-flow .pf-edge:focus path, .pf-flow .pf-edge:hover path { stroke-opacity: 1; }
+.pf-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; margin-top: 6px; }
+.pf-legend i { display: inline-block; width: 18px; height: 6px; vertical-align: middle; margin-right: 4px; }
+.pf-drawer-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.pf-slider { width: 100%; max-width: 420px; }
+.pf-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.pf-muted { color: var(--color-muted); font-size: 12px; }
+@media (max-width: 480px) { .pf-card { padding: 10px; } .pf-line { font-size: 13px; } }

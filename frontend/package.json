@@ -1,0 +1,25 @@
+{
+  "name": "nex-camp",
+  "private": true,
+  "version": "1.0.0",
+  "description": "NeX Camp — an interactive campus problem-intelligence interface.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
+    "readiness": "node scripts/device-readiness.mjs"
+  },
+  "dependencies": {
+    "jsqr": "^1.4.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

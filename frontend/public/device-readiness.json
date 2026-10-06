@@ -1,0 +1,155 @@
+{
+  "generatedAt": "2026-09-26T07:41:17.978Z",
+  "bundle": {
+    "files": [
+      {
+        "file": "assets/index-C9yuHgjv.js",
+        "bytes": 944511,
+        "gzip": 284222
+      },
+      {
+        "file": "assets/three.module-CQ_LhNOD.js",
+        "bytes": 684141,
+        "gzip": 175302
+      },
+      {
+        "file": "assets/index-Be0fHE_E.css",
+        "bytes": 61230,
+        "gzip": 12487
+      },
+      {
+        "file": "assets/MissionPanels-6a5PZXhb.js",
+        "bytes": 19091,
+        "gzip": 5216
+      },
+      {
+        "file": "assets/NoticesSurface-ZLGuN8V1.js",
+        "bytes": 18471,
+        "gzip": 5651
+      },
+      {
+        "file": "assets/campusModel-ChtpIxme.js",
+        "bytes": 15398,
+        "gzip": 6144
+      },
+      {
+        "file": "assets/ClassesSurface-CyJE12pI.js",
+        "bytes": 13982,
+        "gzip": 4153
+      },
+      {
+        "file": "assets/BufferGeometryUtils-CvDrsCAI.js",
+        "bytes": 12933,
+        "gzip": 4190
+      },
+      {
+        "file": "assets/DocumentsSurface-QbNabsUX.js",
+        "bytes": 9023,
+        "gzip": 3377
+      },
+      {
+        "file": "assets/RequestsSurface-BTI6Tf2O.js",
+        "bytes": 8514,
+        "gzip": 3290
+      },
+      {
+        "file": "assets/TuesdayMode-MC1Aakoz.js",
+        "bytes": 7901,
+        "gzip": 3189
+      },
+      {
+        "file": "assets/DeviceSurface-Bxw5CmPg.js",
+        "bytes": 7496,
+        "gzip": 2770
+      },
+      {
+        "file": "assets/FaqSurface-BjdFU_gN.js",
+        "bytes": 7149,
+        "gzip": 2663
+      },
+      {
+        "file": "assets/FeesSurface-ClR_mkvT.js",
+        "bytes": 5818,
+        "gzip": 1621
+      },
+      {
+        "file": "assets/SmsSurface-Dm5vLD5A.js",
+        "bytes": 5559,
+        "gzip": 2134
+      },
+      {
+        "file": "assets/VerifyPage-E6_PIDre.js",
+        "bytes": 5551,
+        "gzip": 2433
+      },
+      {
+        "file": "assets/kit-BhjavdIr.js",
+        "bytes": 5014,
+        "gzip": 2262
+      },
+      {
+        "file": "sw.js",
+        "bytes": 3971,
+        "gzip": 1637
+      },
+      {
+        "file": "assets/BoardSurface-C8YCvcnj.js",
+        "bytes": 2678,
+        "gzip": 1136
+      },
+      {
+        "file": "index.html",
+        "bytes": 1221,
+        "gzip": 674
+      },
+      {
+        "file": "manifest.webmanifest",
+        "bytes": 547,
+        "gzip": 322
+      }
+    ],
+    "totalBytes": 1840199,
+    "totalGzip": 524873,
+    "firstLoadGzip": 297383,
+    "firstLoadNote": "index.html + entry JS + CSS; the 3D library, the extension pages and the hero image load later or not at all in LOW modes"
+  },
+  "apiUrl": "http://localhost:5000",
+  "payloads": [
+    {
+      "path": "/api/notices/feed",
+      "full": 5604,
+      "lite": 2017
+    },
+    {
+      "path": "/api/requests/mine",
+      "full": 17839,
+      "lite": 3182
+    },
+    {
+      "path": "/api/timetable/week",
+      "full": 5614,
+      "lite": 1984
+    },
+    {
+      "path": "/api/timetable/attendance-adjusted",
+      "full": 2746,
+      "lite": 2278
+    },
+    {
+      "path": "/api/fees/me",
+      "full": 1328,
+      "lite": 1288
+    },
+    {
+      "path": "/api/board",
+      "full": 3040,
+      "lite": 1771
+    },
+    {
+      "path": "/api/faq/sections",
+      "full": 6758,
+      "lite": 1661
+    }
+  ],
+  "payloadError": null
+}

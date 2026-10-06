@@ -1,0 +1,560 @@
+// Runtime interface translation.
+//
+// The interface is authored in English; this module swaps the rendered text
+// nodes for a chosen language after each render, so no layout, component or
+// data structure changes. Originals are remembered per node, so switching back
+// to EN is lossless. Numbers, codes and identifiers are never touched.
+
+// EXTENSION HOOK (see HOOKS.md): Odia / Hindi entries for the new surfaces.
+import { EXT_HI, EXT_OR } from "../ext/i18n.js";
+// EXCEPTION-ONLY HOOK: Odia / Hindi entries for the Exception-Only Campus labels.
+import { XO_HI, XO_OR } from "../xo/i18n.js";
+// ROUND-3 HOOK (see CHANGES-ROUND3.md)
+import { PF_HI, PF_OR } from "../proof/i18n.js";
+import { REEL_LABELS_HI, REEL_LABELS_OR } from "../reel/labels.js"; // REEL HOOK (see CHANGES-REEL.md)
+
+const OR = {
+  // chrome
+  "TEAM CODEXFLOW": "ଟିମ୍ କୋଡେକ୍ସଫ୍ଲୋ",
+  "ASK CAMPUS": "କ୍ୟାମ୍ପସ୍‌କୁ ପଚାରନ୍ତୁ",
+  "REPLAY BOOT": "ବୁଟ୍ ପୁନଃଚଳାନ୍ତୁ",
+  "REPLAY INCIDENT": "ଘଟଣା ପୁନଃଚଳାନ୍ତୁ",
+  "STOP REPLAY": "ପୁନଃଚଳନ ବନ୍ଦ",
+  "STOP": "ବନ୍ଦ",
+  "SKIP BOOT": "ବୁଟ୍ ଏଡ଼ାଇ ଦିଅନ୍ତୁ",
+  "● LIVE": "● ଲାଇଭ୍",
+  "6,240 STUDENTS": "6,240 ଛାତ୍ରଛାତ୍ରୀ",
+  "9 BLOCKS": "9 ବ୍ଲକ୍",
+  "RENDER": "ରେଣ୍ଡର୍",
+  "HIGH": "ଉଚ୍ଚ",
+  "MEDIUM": "ମଧ୍ୟମ",
+  "LOW": "କମ୍",
+  "LOW BANDWIDTH": "କମ୍ ବ୍ୟାଣ୍ଡୱିଡ୍ଥ",
+  "3D ON": "3D ଚାଲୁ",
+  "3D LOADING": "3D ଲୋଡ୍ ହେଉଛି",
+  "2D FALLBACK": "2D ଫଲ୍‌ବ୍ୟାକ୍",
+  "INITIALIZING": "ଆରମ୍ଭ ହେଉଛି",
+  "WEBGL · LIVE": "WEBGL · ଲାଇଭ୍",
+  "WEBGL · DRAG TO ORBIT": "WEBGL · ଘୁରାଇବାକୁ ଟାଣନ୍ତୁ",
+  // nav
+  "LANDING": "ପ୍ରାରମ୍ଭ",
+  "STUDENT": "ଛାତ୍ର",
+  "ATTENDANCE": "ଉପସ୍ଥିତି",
+  "MESS": "ମେସ୍",
+  "REPORT": "ରିପୋର୍ଟ",
+  "INCIDENT": "ଘଟଣା",
+  "INVESTIGATION": "ଅନୁସନ୍ଧାନ",
+  "RISK": "ବିପଦ",
+  "INTERVENTION": "ହସ୍ତକ୍ଷେପ",
+  "MISSION CONTROL": "ମିଶନ୍ କଣ୍ଟ୍ରୋଲ୍",
+  // landing
+  "ENTER THE CAMPUS ↓": "କ୍ୟାମ୍ପସ୍‌କୁ ପ୍ରବେଶ କରନ୍ତୁ ↓",
+  "JUDGE STORY MODE · CODEXFLOW": "ଜଜ୍ ଷ୍ଟୋରି ମୋଡ୍ · CODEXFLOW",
+  "ACTIVE INCIDENTS": "ସକ୍ରିୟ ଘଟଣା",
+  "PENDING COMPLAINTS": "ବିଚାରାଧୀନ ଅଭିଯୋଗ",
+  "CAMPUS HEALTH": "କ୍ୟାମ୍ପସ୍ ସ୍ୱାସ୍ଥ୍ୟ",
+  "AVG RESOLUTION": "ହାରାହାରି ସମାଧାନ",
+  "CRITICAL PROBLEMS": "ଗମ୍ଭୀର ସମସ୍ୟା",
+  "SELECT A BUILDING": "ଏକ ଭବନ ବାଛନ୍ତୁ",
+  "TO INSPECT NEX CAMP": "NeX Camp ଦେଖିବା ପାଇଁ",
+  "CURRENT INCIDENT": "ବର୍ତ୍ତମାନର ଘଟଣା",
+  "AI PREDICTION": "AI ପୂର୍ବାନୁମାନ",
+  "AFFECTED": "ପ୍ରଭାବିତ",
+  "AI CONF.": "AI ଆତ୍ମବିଶ୍ୱାସ",
+  "INVESTIGATE →": "ଅନୁସନ୍ଧାନ କରନ୍ତୁ →",
+  "SEMANTIC CLUSTERING": "ସିମାଣ୍ଟିକ୍ କ୍ଲଷ୍ଟରିଂ",
+  "COMPLAINTS": "ଅଭିଯୋଗ",
+  "THE TEN SURFACES": "ଦଶଟି ପୃଷ୍ଠା",
+  "ONE CONNECTED SYSTEM — NOT TEN DASHBOARDS": "ଏକ ସଂଯୁକ୍ତ ସିଷ୍ଟମ୍ — ଦଶଟି ଡ୍ୟାସବୋର୍ଡ ନୁହେଁ",
+  "THE FRICTION MAP": "ଘର୍ଷଣ ମ୍ୟାପ୍",
+  "WITH NEX CAMP": "NeX Camp ସହିତ",
+  "INTERACTIVE CAMPUS · ": "ଇଣ୍ଟରାକ୍ଟିଭ୍ କ୍ୟାମ୍ପସ୍ · ",
+  // pages / labels
+  "REPORT A PROBLEM →": "ଏକ ସମସ୍ୟା ରିପୋର୍ଟ କରନ୍ତୁ →",
+  "TIME TRAVEL": "ସମୟ ଯାତ୍ରା",
+  "RUN SEMANTIC CLUSTERING": "ସିମାଣ୍ଟିକ୍ କ୍ଲଷ୍ଟରିଂ ଚଲାନ୍ତୁ",
+  "REPLAY CLUSTERING": "କ୍ଲଷ୍ଟରିଂ ପୁନଃଚଳାନ୍ତୁ",
+  "RUN CLUSTERING TO SCAN MEMORY": "ସ୍ମୃତି ସ୍କାନ୍ ପାଇଁ କ୍ଲଷ୍ଟରିଂ ଚଲାନ୍ତୁ",
+  "PROBLEM GRAPH — CLICK A NODE": "ସମସ୍ୟା ଗ୍ରାଫ୍ — ଏକ ନୋଡ୍ କ୍ଲିକ୍ କରନ୍ତୁ",
+  "INCIDENT BRIEF": "ଘଟଣା ସାରାଂଶ",
+  "AI CONFIDENCE": "AI ଆତ୍ମବିଶ୍ୱାସ",
+  "EVIDENCE DRAWER": "ପ୍ରମାଣ ଡ୍ରୱର୍",
+  "OPEN INTERVENTION →": "ହସ୍ତକ୍ଷେପ ଖୋଲନ୍ତୁ →",
+  "WHAT-IF SIMULATOR — PICK A DECISION": "ୱାଟ୍-ଇଫ୍ ସିମୁଲେଟର୍ — ଏକ ନିର୍ଣ୍ଣୟ ବାଛନ୍ତୁ",
+  "PROJECTED RISK": "ଆକଳିତ ବିପଦ",
+  "RESOLUTION QUALITY — AFTER THE FIX": "ସମାଧାନ ଗୁଣବତ୍ତା — ମରାମତି ପରେ",
+  "RECOMMENDED ACTION": "ପ୍ରସ୍ତାବିତ କାର୍ଯ୍ୟ",
+  "PRIORITY": "ପ୍ରାଥମିକତା",
+  "EXPECTED IMPACT": "ଆଶାୟୀ ପ୍ରଭାବ",
+  "ESTIMATED RESOLUTION": "ଆକଳିତ ସମାଧାନ",
+  "CONFIDENCE": "ଆତ୍ମବିଶ୍ୱାସ",
+  "OWNER": "ଦାୟିତ୍ୱପ୍ରାପ୍ତ",
+  "ACCEPT": "ଗ୍ରହଣ କରନ୍ତୁ",
+  "MODIFY": "ପରିବର୍ତ୍ତନ କରନ୍ତୁ",
+  "REJECT": "ଅସ୍ୱୀକାର କରନ୍ତୁ",
+  "WHY?": "କାହିଁକି?",
+  "Already inspected": "ପୂର୍ବରୁ ପରିଦର୍ଶିତ",
+  "Resource unavailable": "ସମ୍ବଳ ଅନୁପଲବ୍ଧ",
+  "Different priority": "ଭିନ୍ନ ପ୍ରାଥମିକତା",
+  "Other": "ଅନ୍ୟ",
+  "INSPECTION WINDOW": "ପରିଦର୍ଶନ ସମୟସୀମା",
+  "AI RECOMMENDATION": "AI ପରାମର୍ଶ",
+  "ADMIN ACCEPTED": "ପ୍ରଶାସନ ଗ୍ରହଣ କଲା",
+  "ADMIN MODIFIED": "ପ୍ରଶାସନ ପରିବର୍ତ୍ତନ କଲା",
+  "INTERVENTION STARTED": "ହସ୍ତକ୍ଷେପ ଆରମ୍ଭ",
+  "PREDICTED IMPACT": "ପୂର୍ବାନୁମାନିତ ପ୍ରଭାବ",
+  "HUMAN DECISION": "ମାନବ ନିର୍ଣ୍ଣୟ",
+  "ACTION": "କାର୍ଯ୍ୟ",
+  "OUTCOME": "ପରିଣାମ",
+  "CAMPUS MEMORY": "କ୍ୟାମ୍ପସ୍ ସ୍ମୃତି",
+  "WATER SUPPLY FAILURE": "ଜଳ ଯୋଗାଣ ବିଫଳତା",
+  "SIGNATURES": "ଚିହ୍ନଟ ଲକ୍ଷଣ",
+  "OUTCOME RISK": "ପରିଣାମ ବିପଦ",
+  "RESOLUTION": "ସମାଧାନ",
+  "Booster pump 2 failure": "ବୁଷ୍ଟର୍ ପମ୍ପ 2 ବିଫଳତା",
+  "17-complaint cluster": "17-ଅଭିଯୋଗ କ୍ଲଷ୍ଟର୍",
+  "Night-time usage anomaly": "ରାତ୍ରିକାଳୀନ ବ୍ୟବହାର ଅସାମାନ୍ୟତା",
+  "JUDGE REPLAY": "ଜଜ୍ ରିପ୍ଲେ",
+  "STANDING BY": "ପ୍ରସ୍ତୁତ",
+  "STUDENT REPORTS": "ଛାତ୍ର ରିପୋର୍ଟ କରେ",
+  "AI CLASSIFICATION": "AI ବର୍ଗୀକରଣ",
+  "COMPLAINTS CONVERGE": "ଅଭିଯୋଗ ମିଶିଯାଏ",
+  "CAMPUS MEMORY SCANNED": "କ୍ୟାମ୍ପସ୍ ସ୍ମୃତି ସ୍କାନ୍ ହେଲା",
+  "EVIDENCE ASSEMBLED": "ପ୍ରମାଣ ସଂଗୃହୀତ",
+  "SILENT PROBLEM DETECTED": "ମୌନ ସମସ୍ୟା ଚିହ୍ନଟ",
+  "DECISION SUPPORT": "ନିର୍ଣ୍ଣୟ ସହାୟତା",
+  "CAMPUS MEMORY UPDATED": "କ୍ୟାମ୍ପସ୍ ସ୍ମୃତି ଅଦ୍ୟତନ",
+  "17 SIMILAR COMPLAINTS DETECTED": "17 ସମାନ ଅଭିଯୋଗ ଚିହ୍ନଟ",
+  "ACTIVE INCIDENTS · RANKED BY RISK × AFFECTED": "ସକ୍ରିୟ ଘଟଣା · ବିପଦ × ପ୍ରଭାବିତ ଅନୁସାରେ",
+  "AI BRIEFING": "AI ବ୍ରିଫିଂ",
+  "ACTION QUEUE": "କାର୍ଯ୍ୟ କ୍ୟୁ",
+  "LIVE FEED": "ଲାଇଭ୍ ଫିଡ୍",
+  "CROSS-DOMAIN CHAINS": "କ୍ରସ୍-ଡୋମେନ୍ ଶୃଙ୍ଖଳା",
+  "3D LAYER UNAVAILABLE — DATA VIEWS ABOVE ARE COMPLETE": "3D ସ୍ତର ଅନୁପଲବ୍ଧ — ଉପରର ଡାଟା ଭ୍ୟୁ ସମ୍ପୂର୍ଣ୍ଣ",
+  // page kickers
+  "02 — STUDENT DASHBOARD": "02 — ଛାତ୍ର ଡ୍ୟାସବୋର୍ଡ",
+  "03 — ATTENDANCE INTELLIGENCE": "03 — ଉପସ୍ଥିତି ଇଣ୍ଟେଲିଜେନ୍ସ",
+  "04 — MESS INTELLIGENCE": "04 — ମେସ୍ ଇଣ୍ଟେଲିଜେନ୍ସ",
+  "05 — REPORT & TRACK PROBLEM": "05 — ସମସ୍ୟା ରିପୋର୍ଟ ଓ ଟ୍ରାକିଂ",
+  "06 — INCIDENT INTELLIGENCE": "06 — ଘଟଣା ଇଣ୍ଟେଲିଜେନ୍ସ",
+  "07 — PROBLEM INVESTIGATION": "07 — ସମସ୍ୟା ଅନୁସନ୍ଧାନ",
+  "08 — PREDICTIVE & RISK CENTER": "08 — ପୂର୍ବାନୁମାନ ଓ ବିପଦ କେନ୍ଦ୍ର",
+  "09 — INTERVENTION CENTER": "09 — ହସ୍ତକ୍ଷେପ କେନ୍ଦ୍ର",
+  "10 — CAMPUS MISSION CONTROL": "10 — କ୍ୟାମ୍ପସ୍ ମିଶନ୍ କଣ୍ଟ୍ରୋଲ୍",
+  // page headlines
+  "Attendance is a pattern, not a percentage.": "ଉପସ୍ଥିତି ଏକ ପାଟର୍ନ, ପ୍ରତିଶତ ନୁହେଁ।",
+  "Central Mess": "କେନ୍ଦ୍ରୀୟ ମେସ୍",
+  "demand, not a menu.": "ଚାହିଦା, ମେନୁ ନୁହେଁ।",
+  "A complaint is a digital object.": "ଏକ ଅଭିଯୋଗ ହେଉଛି ଏକ ଡିଜିଟାଲ୍ ବସ୍ତୁ।",
+  "Seventeen complaints. One problem.": "ସତର ଅଭିଯୋଗ। ଏକ ସମସ୍ୟା।",
+  "The system shows its work.": "ସିଷ୍ଟମ୍ ନିଜର କାର୍ଯ୍ୟ ଦେଖାଏ।",
+  "Campus risk, before it becomes news.": "ଖବର ହେବା ପୂର୍ବରୁ କ୍ୟାମ୍ପସ୍ ବିପଦ।",
+  "What should the administration do?": "ପ୍ରଶାସନ କଣ କରିବା ଉଚିତ୍?",
+  "Campus Mission Control": "କ୍ୟାମ୍ପସ୍ ମିଶନ୍ କଣ୍ଟ୍ରୋଲ୍",
+  "Six hops, four days, no memory.": "ଛଅ ଥର ହସ୍ତାନ୍ତର, ଚାରି ଦିନ, କୌଣସି ସ୍ମୃତି ନାହିଁ।",
+  "A campus is not a list of buildings.": "ଏକ କ୍ୟାମ୍ପସ୍ କେବଳ ଭବନର ତାଲିକା ନୁହେଁ।",
+  "HOSTEL B": "ହଷ୍ଟେଲ୍ B",
+  "HISTORICAL RECURRENCE": "ଐତିହାସିକ ପୁନରାବୃତ୍ତି",
+  "INTERACTIVE CAMPUS": "ଇଣ୍ଟରାକ୍ଟିଭ୍ କ୍ୟାମ୍ପସ୍",
+  "AI ↔ HUMAN DECISION": "AI ↔ ମାନବ ନିର୍ଣ୍ଣୟ",
+  "Inspect Hostel B booster pump 2": "ହଷ୍ଟେଲ୍ B ବୁଷ୍ଟର୍ ପମ୍ପ 2 ପରୀକ୍ଷା କରନ୍ତୁ",
+  "CRITICAL": "ଗମ୍ଭୀର",
+  "HIGH — 132 students": "ଉଚ୍ଚ — 132 ଛାତ୍ରଛାତ୍ରୀ",
+  "4 HOURS": "4 ଘଣ୍ଟା",
+  "MAINTENANCE": "ମେଣ୍ଟେନାନ୍ସ",
+  "PLUMBING": "ପ୍ଲମ୍ବିଂ",
+  "RESOLUTION TIME": "ସମାଧାନ ସମୟ",
+  "STUDENT SATISFACTION": "ଛାତ୍ର ସନ୍ତୁଷ୍ଟି",
+  "RISK REDUCTION": "ବିପଦ ହ୍ରାସ",
+  "RECURRENCE": "ପୁନରାବୃତ୍ତି",
+  "COMPLAINTS AFTER FIX": "ମରାମତି ପରେ ଅଭିଯୋଗ",
+  "DO NOTHING · 24H DELAY": "କିଛି ନ କରନ୍ତୁ · 24 ଘଣ୍ଟା ବିଳମ୍ବ",
+  "REPAIR NOW · 4H WINDOW": "ଏବେ ମରାମତି · 4 ଘଣ୍ଟା ସମୟ",
+  "COST": "ଖର୍ଚ୍ଚ",
+  "None in 14 days": "14 ଦିନରେ କିଛି ନାହିଁ",
+  "PROBLEM INVESTIGATION": "ସମସ୍ୟା ଅନୁସନ୍ଧାନ"
+};
+
+const HI = {
+  "TEAM CODEXFLOW": "टीम कोडेक्सफ़्लो",
+  "ASK CAMPUS": "कैंपस से पूछें",
+  "REPLAY BOOT": "बूट दोहराएँ",
+  "REPLAY INCIDENT": "घटना दोहराएँ",
+  "STOP REPLAY": "रीप्ले रोकें",
+  "STOP": "रोकें",
+  "SKIP BOOT": "बूट छोड़ें",
+  "● LIVE": "● लाइव",
+  "6,240 STUDENTS": "6,240 विद्यार्थी",
+  "9 BLOCKS": "9 ब्लॉक",
+  "RENDER": "रेंडर",
+  "HIGH": "उच्च",
+  "MEDIUM": "मध्यम",
+  "LOW": "कम",
+  "LOW BANDWIDTH": "कम बैंडविड्थ",
+  "3D ON": "3D चालू",
+  "3D LOADING": "3D लोड हो रहा है",
+  "2D FALLBACK": "2D फ़ॉलबैक",
+  "INITIALIZING": "आरंभ हो रहा है",
+  "WEBGL · LIVE": "WEBGL · लाइव",
+  "WEBGL · DRAG TO ORBIT": "WEBGL · घुमाने के लिए खींचें",
+  "LANDING": "प्रारंभ",
+  "STUDENT": "विद्यार्थी",
+  "ATTENDANCE": "उपस्थिति",
+  "MESS": "मेस",
+  "REPORT": "रिपोर्ट",
+  "INCIDENT": "घटना",
+  "INVESTIGATION": "जाँच",
+  "RISK": "जोखिम",
+  "INTERVENTION": "हस्तक्षेप",
+  "MISSION CONTROL": "मिशन कंट्रोल",
+  "ENTER THE CAMPUS ↓": "कैंपस में प्रवेश करें ↓",
+  "JUDGE STORY MODE · CODEXFLOW": "जज स्टोरी मोड · CODEXFLOW",
+  "ACTIVE INCIDENTS": "सक्रिय घटनाएँ",
+  "PENDING COMPLAINTS": "लंबित शिकायतें",
+  "CAMPUS HEALTH": "कैंपस स्वास्थ्य",
+  "AVG RESOLUTION": "औसत समाधान",
+  "CRITICAL PROBLEMS": "गंभीर समस्याएँ",
+  "SELECT A BUILDING": "एक भवन चुनें",
+  "TO INSPECT NEX CAMP": "NeX Camp देखने के लिए",
+  "CURRENT INCIDENT": "वर्तमान घटना",
+  "AI PREDICTION": "AI पूर्वानुमान",
+  "AFFECTED": "प्रभावित",
+  "AI CONF.": "AI विश्वास",
+  "INVESTIGATE →": "जाँच करें →",
+  "SEMANTIC CLUSTERING": "सिमेंटिक क्लस्टरिंग",
+  "COMPLAINTS": "शिकायतें",
+  "THE TEN SURFACES": "दस सतहें",
+  "ONE CONNECTED SYSTEM — NOT TEN DASHBOARDS": "एक जुड़ा हुआ सिस्टम — दस डैशबोर्ड नहीं",
+  "THE FRICTION MAP": "घर्षण मानचित्र",
+  "WITH NEX CAMP": "NeX Camp के साथ",
+  "INTERACTIVE CAMPUS · ": "इंटरैक्टिव कैंपस · ",
+  "REPORT A PROBLEM →": "समस्या दर्ज करें →",
+  "TIME TRAVEL": "समय यात्रा",
+  "RUN SEMANTIC CLUSTERING": "सिमेंटिक क्लस्टरिंग चलाएँ",
+  "REPLAY CLUSTERING": "क्लस्टरिंग दोहराएँ",
+  "RUN CLUSTERING TO SCAN MEMORY": "स्मृति स्कैन के लिए क्लस्टरिंग चलाएँ",
+  "PROBLEM GRAPH — CLICK A NODE": "समस्या ग्राफ़ — एक नोड पर क्लिक करें",
+  "INCIDENT BRIEF": "घटना सारांश",
+  "AI CONFIDENCE": "AI विश्वास",
+  "EVIDENCE DRAWER": "साक्ष्य दराज़",
+  "OPEN INTERVENTION →": "हस्तक्षेप खोलें →",
+  "WHAT-IF SIMULATOR — PICK A DECISION": "व्हाट-इफ़ सिमुलेटर — एक निर्णय चुनें",
+  "PROJECTED RISK": "अनुमानित जोखिम",
+  "RESOLUTION QUALITY — AFTER THE FIX": "समाधान गुणवत्ता — मरम्मत के बाद",
+  "RECOMMENDED ACTION": "अनुशंसित कार्रवाई",
+  "PRIORITY": "प्राथमिकता",
+  "EXPECTED IMPACT": "अपेक्षित प्रभाव",
+  "ESTIMATED RESOLUTION": "अनुमानित समाधान",
+  "CONFIDENCE": "विश्वास",
+  "OWNER": "उत्तरदायी",
+  "ACCEPT": "स्वीकार करें",
+  "MODIFY": "संशोधित करें",
+  "REJECT": "अस्वीकार करें",
+  "WHY?": "क्यों?",
+  "Already inspected": "पहले ही निरीक्षण हो चुका",
+  "Resource unavailable": "संसाधन अनुपलब्ध",
+  "Different priority": "भिन्न प्राथमिकता",
+  "Other": "अन्य",
+  "INSPECTION WINDOW": "निरीक्षण अवधि",
+  "AI RECOMMENDATION": "AI अनुशंसा",
+  "ADMIN ACCEPTED": "प्रशासन ने स्वीकार किया",
+  "ADMIN MODIFIED": "प्रशासन ने संशोधित किया",
+  "INTERVENTION STARTED": "हस्तक्षेप शुरू",
+  "PREDICTED IMPACT": "पूर्वानुमानित प्रभाव",
+  "HUMAN DECISION": "मानवीय निर्णय",
+  "ACTION": "कार्रवाई",
+  "OUTCOME": "परिणाम",
+  "CAMPUS MEMORY": "कैंपस स्मृति",
+  "WATER SUPPLY FAILURE": "जल आपूर्ति विफलता",
+  "SIGNATURES": "पहचान लक्षण",
+  "OUTCOME RISK": "परिणाम जोखिम",
+  "RESOLUTION": "समाधान",
+  "Booster pump 2 failure": "बूस्टर पंप 2 विफलता",
+  "17-complaint cluster": "17-शिकायत क्लस्टर",
+  "Night-time usage anomaly": "रात्रिकालीन उपयोग विसंगति",
+  "JUDGE REPLAY": "जज रीप्ले",
+  "STANDING BY": "तैयार",
+  "STUDENT REPORTS": "विद्यार्थी रिपोर्ट करता है",
+  "AI CLASSIFICATION": "AI वर्गीकरण",
+  "COMPLAINTS CONVERGE": "शिकायतें एक होती हैं",
+  "CAMPUS MEMORY SCANNED": "कैंपस स्मृति स्कैन हुई",
+  "EVIDENCE ASSEMBLED": "साक्ष्य संकलित",
+  "SILENT PROBLEM DETECTED": "मौन समस्या पहचानी गई",
+  "DECISION SUPPORT": "निर्णय सहायता",
+  "CAMPUS MEMORY UPDATED": "कैंपस स्मृति अद्यतन",
+  "17 SIMILAR COMPLAINTS DETECTED": "17 समान शिकायतें पहचानी गईं",
+  "ACTIVE INCIDENTS · RANKED BY RISK × AFFECTED": "सक्रिय घटनाएँ · जोखिम × प्रभावित के अनुसार",
+  "AI BRIEFING": "AI ब्रीफ़िंग",
+  "ACTION QUEUE": "कार्य कतार",
+  "LIVE FEED": "लाइव फ़ीड",
+  "CROSS-DOMAIN CHAINS": "क्रॉस-डोमेन श्रृंखलाएँ",
+  "3D LAYER UNAVAILABLE — DATA VIEWS ABOVE ARE COMPLETE": "3D लेयर अनुपलब्ध — ऊपर के डेटा व्यू पूर्ण हैं",
+  "02 — STUDENT DASHBOARD": "02 — विद्यार्थी डैशबोर्ड",
+  "03 — ATTENDANCE INTELLIGENCE": "03 — उपस्थिति इंटेलिजेंस",
+  "04 — MESS INTELLIGENCE": "04 — मेस इंटेलिजेंस",
+  "05 — REPORT & TRACK PROBLEM": "05 — समस्या दर्ज व ट्रैक करें",
+  "06 — INCIDENT INTELLIGENCE": "06 — घटना इंटेलिजेंस",
+  "07 — PROBLEM INVESTIGATION": "07 — समस्या जाँच",
+  "08 — PREDICTIVE & RISK CENTER": "08 — पूर्वानुमान व जोखिम केंद्र",
+  "09 — INTERVENTION CENTER": "09 — हस्तक्षेप केंद्र",
+  "10 — CAMPUS MISSION CONTROL": "10 — कैंपस मिशन कंट्रोल",
+  "Attendance is a pattern, not a percentage.": "उपस्थिति एक पैटर्न है, प्रतिशत नहीं।",
+  "Central Mess": "केंद्रीय मेस",
+  "demand, not a menu.": "मांग, मेन्यू नहीं।",
+  "A complaint is a digital object.": "एक शिकायत एक डिजिटल वस्तु है।",
+  "Seventeen complaints. One problem.": "सत्रह शिकायतें। एक समस्या।",
+  "The system shows its work.": "सिस्टम अपना काम दिखाता है।",
+  "Campus risk, before it becomes news.": "खबर बनने से पहले कैंपस का जोखिम।",
+  "What should the administration do?": "प्रशासन को क्या करना चाहिए?",
+  "Campus Mission Control": "कैंपस मिशन कंट्रोल",
+  "Six hops, four days, no memory.": "छह हस्तांतरण, चार दिन, कोई स्मृति नहीं।",
+  "A campus is not a list of buildings.": "कैंपस भवनों की सूची नहीं है।",
+  "HOSTEL B": "हॉस्टल B",
+  "HISTORICAL RECURRENCE": "ऐतिहासिक पुनरावृत्ति",
+  "INTERACTIVE CAMPUS": "इंटरैक्टिव कैंपस",
+  "AI ↔ HUMAN DECISION": "AI ↔ मानवीय निर्णय",
+  "Inspect Hostel B booster pump 2": "हॉस्टल B बूस्टर पंप 2 का निरीक्षण करें",
+  "CRITICAL": "गंभीर",
+  "HIGH — 132 students": "उच्च — 132 विद्यार्थी",
+  "4 HOURS": "4 घंटे",
+  "MAINTENANCE": "मेंटेनेंस",
+  "PLUMBING": "प्लंबिंग",
+  "RESOLUTION TIME": "समाधान समय",
+  "STUDENT SATISFACTION": "विद्यार्थी संतुष्टि",
+  "RISK REDUCTION": "जोखिम में कमी",
+  "RECURRENCE": "पुनरावृत्ति",
+  "COMPLAINTS AFTER FIX": "मरम्मत के बाद शिकायतें",
+  "DO NOTHING · 24H DELAY": "कुछ न करें · 24 घंटे विलंब",
+  "REPAIR NOW · 4H WINDOW": "अभी मरम्मत · 4 घंटे की अवधि",
+  "COST": "लागत",
+  "None in 14 days": "14 दिनों में कोई नहीं",
+  "PROBLEM INVESTIGATION": "समस्या जाँच"
+};
+
+// PS07 additions: early warning, Campus Pulse, WHY?, kiosk and adoption.
+// Spread first, so an entry that already existed keeps its translation.
+const PS07_OR = {
+  "CAMPUS PULSE": "କ୍ୟାମ୍ପସ୍ ପଲ୍ସ",
+  "VIEW CALCULATION": "ଗଣନା ଦେଖନ୍ତୁ",
+  "PROTOTYPE OPERATIONAL INDICATOR": "ପ୍ରୋଟୋଟାଇପ୍ କାର୍ଯ୍ୟକ୍ଷମ ସୂଚକ",
+  "CAMPUS EARLY WARNING · ADMIN ALERT CENTER": "କ୍ୟାମ୍ପସ୍ ପୂର୍ବ ଚେତାବନୀ · ପ୍ରଶାସନ ସତର୍କ କେନ୍ଦ୍ର",
+  "What needs attention, and why.": "କେଉଁଥିରେ ଧ୍ୟାନ ଦେବା ଆବଶ୍ୟକ, ଏବଂ କାହିଁକି।",
+  "AI EARLY WARNING · ALL MODULES": "AI ପୂର୍ବ ଚେତାବନୀ · ସମସ୍ତ ମଡ୍ୟୁଲ୍",
+  "Two weeks of every signal, compared week on week.": "ପ୍ରତ୍ୟେକ ସଙ୍କେତର ଦୁଇ ସପ୍ତାହ, ସପ୍ତାହ ପରେ ସପ୍ତାହ ତୁଳନା।",
+  "AI PREDICTIVE INSIGHTS": "AI ପୂର୍ବାନୁମାନ ଅନ୍ତର୍ଦୃଷ୍ଟି",
+  "What is likely next, with the data behind it.": "ପରେ କଣ ହେବାର ସମ୍ଭାବନା, ତା ପଛର ତଥ୍ୟ ସହିତ।",
+  "CRITICAL": "ଗମ୍ଭୀର",
+  "WARNING": "ଚେତାବନୀ",
+  "WATCH": "ନଜର",
+  "NORMAL": "ସାଧାରଣ",
+  "ALL": "ସମସ୍ତ",
+  "OPEN ALERT →": "ସତର୍କ ଖୋଲନ୍ତୁ →",
+  "INVESTIGATE": "ଅନୁସନ୍ଧାନ କରନ୍ତୁ",
+  "ASSIGN": "ଦାୟିତ୍ୱ ଦିଅନ୍ତୁ",
+  "ASSIGN MAINTENANCE": "ରକ୍ଷଣାବେକ୍ଷଣକୁ ଦିଅନ୍ତୁ",
+  "ESCALATE": "ଉପରକୁ ପଠାନ୍ତୁ",
+  "RESOLVE ALERT": "ସତର୍କ ବନ୍ଦ କରନ୍ତୁ",
+  "VIEW RELATED COMPLAINTS": "ସମ୍ପର୍କିତ ଅଭିଯୋଗ ଦେଖନ୍ତୁ",
+  "WHY?": "କାହିଁକି?",
+  "What changed": "କଣ ବଦଳିଲା",
+  "Why it was detected": "ଏହା କାହିଁକି ଚିହ୍ନଟ ହେଲା",
+  "Who is affected": "କିଏ ପ୍ରଭାବିତ",
+  "Possible cause": "ସମ୍ଭାବ୍ୟ କାରଣ",
+  "Confidence": "ଆତ୍ମବିଶ୍ୱାସ",
+  "Recommended action": "ପରାମର୍ଶିତ ପଦକ୍ଷେପ",
+  "ACTUAL DATA": "ପ୍ରକୃତ ତଥ୍ୟ",
+  "AI DETECTED PATTERN": "AI ଚିହ୍ନଟ ପାଟର୍ନ",
+  "AI HYPOTHESIS": "AI ଅନୁମାନ",
+  "RECOMMENDED ACTION": "ପରାମର୍ଶିତ ପଦକ୍ଷେପ",
+  "ESTIMATED": "ଆକଳିତ",
+  "BASED ON RECENT TRENDS": "ସାମ୍ପ୍ରତିକ ଧାରା ଉପରେ ଆଧାରିତ",
+  "Data used": "ବ୍ୟବହୃତ ତଥ୍ୟ",
+  "Horizon": "ସମୟସୀମା",
+  "Action": "ପଦକ୍ଷେପ",
+  "INSUFFICIENT DATA": "ଅପର୍ଯ୍ୟାପ୍ତ ତଥ୍ୟ",
+  "Insufficient data to determine the cause.": "କାରଣ ନିର୍ଣ୍ଣୟ ପାଇଁ ପର୍ଯ୍ୟାପ୍ତ ତଥ୍ୟ ନାହିଁ।",
+  "Insufficient data for a reliable prediction.": "ବିଶ୍ୱସନୀୟ ପୂର୍ବାନୁମାନ ପାଇଁ ପର୍ଯ୍ୟାପ୍ତ ତଥ୍ୟ ନାହିଁ।",
+  "ASSISTED ACCESS · KIOSK REQUESTS": "ସହାୟକ ପ୍ରବେଶ · କିଓସ୍କ ଅନୁରୋଧ",
+  "COLLEGE ADOPTION & MIGRATION": "କଲେଜ ଗ୍ରହଣ ଓ ସ୍ଥାନାନ୍ତର",
+  "Campus Service Kiosk": "କ୍ୟାମ୍ପସ୍ ସେବା କିଓସ୍କ",
+  "KIOSK": "କିଓସ୍କ",
+  "Student ID": "ଛାତ୍ର ID",
+  "FIND STUDENT →": "ଛାତ୍ର ଖୋଜନ୍ତୁ →",
+  "END SESSION": "ସେସନ୍ ଶେଷ କରନ୍ତୁ",
+  "Raise a complaint": "ଅଭିଯୋଗ କରନ୍ତୁ",
+  "Gate pass / leave": "ଗେଟ୍ ପାସ୍ / ଛୁଟି",
+  "Check attendance": "ଉପସ୍ଥିତି ଦେଖନ୍ତୁ",
+  "Mess feedback": "ମେସ୍ ମତାମତ",
+  "Notices": "ବିଜ୍ଞପ୍ତି",
+  "Documents": "ଦଲିଲ",
+  "Available": "ଉପଲବ୍ଧ",
+  "Not available": "ଉପଲବ୍ଧ ନାହିଁ",
+  "FILE COMPLAINT": "ଅଭିଯୋଗ ଦାଖଲ କରନ୍ତୁ",
+  "APPLY FOR GATE PASS": "ଗେଟ୍ ପାସ୍ ପାଇଁ ଆବେଦନ",
+  "SUBMIT RATING": "ମୂଲ୍ୟାଙ୍କନ ପଠାନ୍ତୁ",
+  "VERIFY CODE": "କୋଡ୍ ଯାଞ୍ଚ କରନ୍ତୁ",
+  "VALIDATE IMPORT": "ଆମଦାନୀ ଯାଞ୍ଚ କରନ୍ତୁ",
+  "CHOOSE CSV FILE": "CSV ଫାଇଲ୍ ବାଛନ୍ତୁ",
+  "RECURRING ISSUE INTELLIGENCE": "ପୁନରାବୃତ୍ତ ସମସ୍ୟା ବିଶ୍ଳେଷଣ",
+  "EARLY WARNING": "ପୂର୍ବ ଚେତାବନୀ",
+  "RECURRING ISSUE": "ପୁନରାବୃତ୍ତ ସମସ୍ୟା",
+  "CONNECTED": "ସଂଯୁକ୍ତ",
+  "OFFLINE": "ଅଫଲାଇନ୍",
+};
+
+const PS07_HI = {
+  "CAMPUS PULSE": "कैंपस पल्स",
+  "VIEW CALCULATION": "गणना देखें",
+  "PROTOTYPE OPERATIONAL INDICATOR": "प्रोटोटाइप परिचालन संकेतक",
+  "CAMPUS EARLY WARNING · ADMIN ALERT CENTER": "कैंपस पूर्व चेतावनी · प्रशासन अलर्ट केंद्र",
+  "What needs attention, and why.": "किस पर ध्यान देना है, और क्यों।",
+  "AI EARLY WARNING · ALL MODULES": "AI पूर्व चेतावनी · सभी मॉड्यूल",
+  "Two weeks of every signal, compared week on week.": "हर संकेत के दो सप्ताह, सप्ताह-दर-सप्ताह तुलना।",
+  "AI PREDICTIVE INSIGHTS": "AI पूर्वानुमान अंतर्दृष्टि",
+  "What is likely next, with the data behind it.": "आगे क्या होने की संभावना है, उसके पीछे के डेटा सहित।",
+  "CRITICAL": "गंभीर",
+  "WARNING": "चेतावनी",
+  "WATCH": "निगरानी",
+  "NORMAL": "सामान्य",
+  "ALL": "सभी",
+  "OPEN ALERT →": "अलर्ट खोलें →",
+  "INVESTIGATE": "जाँच करें",
+  "ASSIGN": "सौंपें",
+  "ASSIGN MAINTENANCE": "रखरखाव को सौंपें",
+  "ESCALATE": "आगे बढ़ाएँ",
+  "RESOLVE ALERT": "अलर्ट बंद करें",
+  "VIEW RELATED COMPLAINTS": "संबंधित शिकायतें देखें",
+  "WHY?": "क्यों?",
+  "What changed": "क्या बदला",
+  "Why it was detected": "यह क्यों पकड़ा गया",
+  "Who is affected": "कौन प्रभावित है",
+  "Possible cause": "संभावित कारण",
+  "Confidence": "विश्वास स्तर",
+  "Recommended action": "अनुशंसित कार्रवाई",
+  "ACTUAL DATA": "वास्तविक डेटा",
+  "AI DETECTED PATTERN": "AI द्वारा पहचाना गया पैटर्न",
+  "AI HYPOTHESIS": "AI परिकल्पना",
+  "RECOMMENDED ACTION": "अनुशंसित कार्रवाई",
+  "ESTIMATED": "अनुमानित",
+  "BASED ON RECENT TRENDS": "हाल के रुझानों पर आधारित",
+  "Data used": "प्रयुक्त डेटा",
+  "Horizon": "समय-सीमा",
+  "Action": "कार्रवाई",
+  "INSUFFICIENT DATA": "अपर्याप्त डेटा",
+  "Insufficient data to determine the cause.": "कारण तय करने के लिए पर्याप्त डेटा नहीं है।",
+  "Insufficient data for a reliable prediction.": "विश्वसनीय पूर्वानुमान के लिए पर्याप्त डेटा नहीं है।",
+  "ASSISTED ACCESS · KIOSK REQUESTS": "सहायता प्राप्त पहुँच · कियोस्क अनुरोध",
+  "COLLEGE ADOPTION & MIGRATION": "कॉलेज अपनाना और माइग्रेशन",
+  "Campus Service Kiosk": "कैंपस सेवा कियोस्क",
+  "KIOSK": "कियोस्क",
+  "Student ID": "छात्र आईडी",
+  "FIND STUDENT →": "छात्र खोजें →",
+  "END SESSION": "सत्र समाप्त करें",
+  "Raise a complaint": "शिकायत दर्ज करें",
+  "Gate pass / leave": "गेट पास / छुट्टी",
+  "Check attendance": "उपस्थिति देखें",
+  "Mess feedback": "मेस प्रतिक्रिया",
+  "Notices": "सूचनाएँ",
+  "Documents": "दस्तावेज़",
+  "Available": "उपलब्ध",
+  "Not available": "उपलब्ध नहीं",
+  "FILE COMPLAINT": "शिकायत दर्ज करें",
+  "APPLY FOR GATE PASS": "गेट पास के लिए आवेदन करें",
+  "SUBMIT RATING": "रेटिंग भेजें",
+  "VERIFY CODE": "कोड सत्यापित करें",
+  "VALIDATE IMPORT": "आयात जाँचें",
+  "CHOOSE CSV FILE": "CSV फ़ाइल चुनें",
+  "RECURRING ISSUE INTELLIGENCE": "आवर्ती समस्या विश्लेषण",
+  "EARLY WARNING": "पूर्व चेतावनी",
+  "RECURRING ISSUE": "आवर्ती समस्या",
+  "CONNECTED": "जुड़ा हुआ",
+  "OFFLINE": "ऑफ़लाइन",
+};
+
+const DICTS = { "ଓଡ଼ିଆ": { ...PS07_OR, ...OR }, "हिन्दी": { ...PS07_HI, ...HI } };
+// EXTENSION HOOK (see HOOKS.md): only keys not already present are added.
+for (const [lang, extra] of [["ଓଡ଼ିଆ", EXT_OR], ["हिन्दी", EXT_HI]]) for (const [k, v] of Object.entries(extra)) if (!(k in DICTS[lang])) DICTS[lang][k] = v;
+// EXCEPTION-ONLY HOOK: same rule — only keys not already present are added.
+for (const [lang, extra] of [["ଓଡ଼ିଆ", XO_OR], ["हिन्दी", XO_HI]]) for (const [k, v] of Object.entries(extra)) if (!(k in DICTS[lang])) DICTS[lang][k] = v;
+// ROUND-3 HOOK: same rule — only keys not already present are added.
+for (const [lang, extra] of [["ଓଡ଼ିଆ", PF_OR], ["हिन्दी", PF_HI]]) for (const [k, v] of Object.entries(extra)) if (!(k in DICTS[lang])) DICTS[lang][k] = v;
+for (const [lang, extra] of [["ଓଡ଼ିଆ", REEL_LABELS_OR], ["हिन्दी", REEL_LABELS_HI]]) for (const [k, v] of Object.entries(extra)) if (!(k in DICTS[lang])) DICTS[lang][k] = v; // REEL HOOK
+
+// Longer copy: paragraphs are matched on their leading clause so one entry
+// covers a whole sentence block without duplicating punctuation.
+const PROSE = {
+  "ଓଡ଼ିଆ": [
+    ["We don't just record campus problems.", "ଆମେ କେବଳ କ୍ୟାମ୍ପସ୍ ସମସ୍ୟା ଲେଖି ରଖୁନାହିଁ। ଏହି ଅପରେଟିଂ ସିଷ୍ଟମ୍ ସେଗୁଡ଼ିକୁ ବୁଝେ, ଯୋଡ଼େ, ପୂର୍ବାନୁମାନ କରେ, ଅନୁସନ୍ଧାନ କରେ ଏବଂ ସମାଧାନରେ ସହାୟତା କରେ।"],
+    ["The recommendation waits for a human.", "ପରାମର୍ଶ ଏକ ମାନବ ନିର୍ଣ୍ଣୟ ପାଇଁ ଅପେକ୍ଷା କରୁଛି। ଏଠାରେ AI ନିର୍ଣ୍ଣୟ ସହାୟକ, ଅଦୃଶ୍ୟ ଅଧିକାରୀ ନୁହେଁ।"],
+    ["Campus memory returns 2025-11-04:", "କ୍ୟାମ୍ପସ୍ ସ୍ମୃତି 2025-11-04 ଫେରାଇ ଆଣେ: ସେହି ଭବନ, ସେହି ପ୍ରେସର୍ ଗ୍ରାଫ୍, 5.4 ଘଣ୍ଟାରେ ସମାଧାନ। କ୍ୟାମ୍ପସ୍ ପୂର୍ବ ଘଟଣା ମନେ ରଖେ।"],
+    ["Four water incidents in thirteen months", "ତେର ମାସରେ ସେହି ଭବନରେ ଚାରିଟି ଜଳ ଘଟଣା। ଏହା ଅଭିଯୋଗ କ୍ୟୁ ନୁହେଁ — ଏହା ଏକ ପୁନରାବୃତ୍ତ ବିଫଳତା।"],
+    ["Pattern stored.", "ପାଟର୍ନ ସଂରକ୍ଷିତ। କ୍ୟାମ୍ପସ୍‌ରେ ସମାନ ଲକ୍ଷଣ ଏବେ ଆଗୁଆ ଚିହ୍ନଟ ହେବ।"],
+    ["Compressing the incident", "ଘଟଣାଟିକୁ ଏକ ସ୍ଥାୟୀ କ୍ୟାମ୍ପସ୍ ସଙ୍କେତରେ ସଂକୁଚିତ କରାଯାଉଛି…"],
+    ["A status of RESOLVED", "RESOLVED ଷ୍ଟାଟସ୍ ସମାଧାନର ପ୍ରମାଣ ନୁହେଁ। ପ୍ରତ୍ୟେକ ହସ୍ତକ୍ଷେପ ସମୟ, ସନ୍ତୁଷ୍ଟି, ବିପଦ ହ୍ରାସ ଓ ପୁନରାବୃତ୍ତି ଉପରେ ମୂଲ୍ୟାଙ୍କିତ ହୁଏ।"]
+  ],
+  "हिन्दी": [
+    ["We don't just record campus problems.", "हम कैंपस की समस्याएँ केवल दर्ज नहीं करते। यह ऑपरेटिंग सिस्टम उन्हें समझता है, जोड़ता है, पूर्वानुमान करता है, जाँच करता है और समाधान में मदद करता है।"],
+    ["The recommendation waits for a human.", "अनुशंसा एक मानवीय निर्णय की प्रतीक्षा कर रही है। यहाँ AI निर्णय सहायक है, कोई अदृश्य अधिकारी नहीं।"],
+    ["Campus memory returns 2025-11-04:", "कैंपस स्मृति 2025-11-04 लौटाती है: वही भवन, वही प्रेशर ग्राफ़, 5.4 घंटे में समाधान। कैंपस याद रखता है कि पहले क्या हुआ था।"],
+    ["Four water incidents in thirteen months", "तेरह महीनों में उसी भवन में चार जल घटनाएँ। यह शिकायत कतार नहीं — यह एक आवर्ती विफलता है।"],
+    ["Pattern stored.", "पैटर्न संग्रहित। कैंपस में ऐसा ही लक्षण अब पहले पहचाना जाएगा।"],
+    ["Compressing the incident", "घटना को एक स्थायी कैंपस संकेत में संपीड़ित किया जा रहा है…"],
+    ["A status of RESOLVED", "RESOLVED का दर्जा समाधान का प्रमाण नहीं है। हर हस्तक्षेप समय, संतुष्टि, जोखिम कमी और पुनरावृत्ति पर आँका जाता है।"]
+  ]
+};
+
+const ORIGINALS = new WeakMap();
+// The text this module last wrote into each node. A node whose current text is
+// neither its remembered original nor what we wrote has been updated by React
+// (a new meal, a new answer, a changed number); that text becomes the new
+// original. Without this, translated pages froze their dynamic text at the
+// first value seen, so buttons looked dead in ଓଡ଼ିଆ and हिन्दी.
+const WRITTEN = new WeakMap();
+
+function walk(root, fn) {
+  const it = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  const nodes = [];
+  let n;
+  while ((n = it.nextNode())) nodes.push(n);
+  nodes.forEach(fn);
+}
+
+export function translate(root, lang) {
+  if (!root) return;
+  const dict = DICTS[lang];
+  const prose = PROSE[lang] || [];
+  walk(root, (node) => {
+    const raw = node.nodeValue;
+    const updatedByReact = ORIGINALS.has(node) && raw !== ORIGINALS.get(node) && raw !== WRITTEN.get(node);
+    if (!ORIGINALS.has(node) || updatedByReact) {
+      if (!raw || !raw.trim()) return;
+      ORIGINALS.set(node, raw);
+      WRITTEN.delete(node);
+    }
+    const original = ORIGINALS.get(node);
+    if (original === undefined) return;
+    if (!dict) { if (node.nodeValue !== original) node.nodeValue = original; WRITTEN.set(node, original); return; }
+    const key = original.trim();
+    let out = dict[key];
+    if (out === undefined) {
+      const hit = prose.find(([lead]) => key.indexOf(lead) === 0);
+      if (hit) out = hit[1];
+    }
+    if (out === undefined && key.indexOf("·") >= 0) {
+      // "CAMPUS MEMORY · HOSTEL B" — translate each segment it knows
+      const parts = key.split("·");
+      let any = false;
+      const mapped = parts.map((part) => {
+        const t = part.trim();
+        if (dict[t] !== undefined) { any = true; return part.replace(t, dict[t]); }
+        return part;
+      });
+      if (any) out = mapped.join("·");
+    }
+    const next = out === undefined ? original : original.replace(key, out);
+    if (node.nodeValue !== next) node.nodeValue = next;
+    WRITTEN.set(node, next);
+  });
+}
+
+export const languages = ["EN", "ଓଡ଼ିଆ", "हिन्दी"];

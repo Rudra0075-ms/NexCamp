@@ -1,0 +1,34 @@
+/* Exception-Only Campus — small additions on top of intel.css and ext.css. */
+.xo-verdict { border: 1px solid var(--ci-line); border-left-width: 3px; border-radius: var(--radius-md); padding: 10px 12px; margin-top: 10px; background: var(--color-surface); min-width: 0; overflow-wrap: anywhere; }
+.xo-verdict-auto { border-left-color: var(--ci-ok); }
+.xo-verdict-human { border-left-color: var(--color-warn); }
+.xo-verdict-head { font-family: var(--font-heading); font-size: 14px; letter-spacing: .02em; }
+.xo-verdict-note { margin: 8px 0 0; }
+.xo-cite { margin: 8px 0; padding: 6px 10px; border-left: 3px solid var(--ci-line); font-size: 13px; color: var(--color-neutral-800); font-style: italic; }
+.xo-checks { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; font-size: 13px; }
+.xo-checks li.ok > span { color: var(--ci-ok); font-weight: 800; }
+.xo-checks li.bad > span { color: var(--color-warn); font-weight: 800; }
+.xo-decision { margin-top: 8px; font-size: 13px; line-height: 1.5; }
+.xo-linkbtn { min-height: 32px; }
+.xo-calc { margin-top: 8px; }
+.xo-calc-body { margin-top: 8px; padding: 10px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--color-neutral-400); font-size: 13px; line-height: 1.55; overflow-x: auto; }
+.xo-calc-body table { border-collapse: collapse; width: 100%; font-size: 12px; }
+.xo-calc-body th, .xo-calc-body td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--ci-line); vertical-align: top; }
+.xo-kpi { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.xo-kpi b { font-family: var(--font-heading); font-weight: 800; font-size: clamp(40px, 5vw, 64px); line-height: .9; letter-spacing: -.03em; }
+.xo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(12px, 2vw, 22px); align-items: start; }
+.xo-table-wrap { overflow-x: auto; max-width: 100%; }
+.xo-table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.xo-table th, .xo-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--ci-line); vertical-align: top; }
+.xo-table th { font-size: 10px; color: var(--color-muted); }
+.xo-bar { height: 6px; border-radius: 6px; overflow: hidden; background: var(--color-neutral-300); position: relative; min-width: 60px; }
+.xo-bar > i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--color-accent); }
+.xo-bar.ok > i { background: var(--ci-ok); }
+.xo-mute { opacity: .6; }
+.xo-undo { min-height: 36px; }
+@media (max-width: 480px) { .xo-verdict { padding: 8px 10px; } }
+
+/* Phase 10 — Tuesday Test panel (reuses the Tuesday Mode panel frame) */
+.xo-tuesday { inset: auto auto 12px 12px; }
+.xo-tuesday-close { background: none; border-radius: var(--radius-pill); border: 1px solid var(--color-neutral-500); color: inherit; font: inherit; font-size: 11px; font-weight: 800; letter-spacing: .12em; padding: 6px 10px; cursor: pointer; }
+@media (max-width: 720px) { .xo-tuesday { inset: auto 6px 6px 6px; } }

@@ -1,0 +1,164 @@
+/* Cominvi layer — the interaction language of the charcoal & orange theme,
+   after cominvi.com.mx (Holographik). Loaded after theme.css; it only adds
+   classes and refines existing ones, so every rule here can be removed on its
+   own without breaking layout or behaviour. Colours are theme tokens.
+
+     buttons      outlined by default, orange fill / orange border on hover
+     text swap    a label slides up and its copy rises in from below
+     sections     "S.01" blueprint labels above section headings
+     header       hides on scroll down, returns on scroll up (lib/cominvi.js)
+     menu         full-screen page menu below 760px
+     media        slow zoom inside the frame on hover
+     accordions   <details> read OPEN / CLOSE and ease their height
+     loader       the boot intro's 0 → 100 counter
+
+   Motion uses transform / translate / opacity only, on one in-out curve. */
+
+/* ---- links and buttons --------------------------------------------------- */
+a { color: var(--color-heading); text-decoration-color: color-mix(in srgb, var(--color-heading) 35%, transparent); transition: color .35s var(--ease-io), text-decoration-color .35s var(--ease-io); }
+a:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+.nx-link:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+.nx-header .nex-nav-item[aria-current="page"] .nx-num { color: var(--color-accent); opacity: 1; }
+
+.btn { transition: background-color .35s var(--ease-io), color .35s var(--ease-io), border-color .35s var(--ease-io), transform .35s var(--ease-io); }
+/* primary: dark with an orange outline; fills orange on hover */
+.btn-primary, .fs-cta {
+  background: transparent; color: var(--color-heading) !important; border: 1px solid var(--color-accent);
+  transition: background-color .35s var(--ease-io), color .35s var(--ease-io), border-color .35s var(--ease-io);
+}
+.btn-primary:hover, .fs-cta:hover { background: var(--color-accent); color: var(--color-on-accent) !important; transform: none; }
+.btn-primary:active, .fs-cta:active { background: var(--color-accent-400); border-color: var(--color-accent-400); }
+.btn-primary:disabled:hover { background: transparent; color: var(--color-heading) !important; }
+/* secondary and ghost: outlined / bare; orange border and type on hover */
+.btn-secondary { border-color: color-mix(in srgb, var(--color-heading) 22%, transparent); }
+.btn-secondary:hover { background: transparent; border-color: var(--color-accent); color: var(--color-accent); }
+.btn-secondary:active { background: var(--color-accent-100); }
+.btn-ghost:hover { background: transparent; color: var(--color-accent); }
+.nx-card-go:hover { color: var(--color-accent) !important; text-decoration-color: var(--color-accent) !important; }
+::selection { background: var(--color-accent); color: var(--color-on-accent); }
+:focus-visible { outline-color: var(--color-accent); }
+
+/* Text swap removed for clean stable UI */
+
+/* ---- section labels: S.01, S.02 … ----------------------------------------
+   Numbered in document order on every page; purely presentational. */
+main { counter-reset: cv-s; }
+.nx-hero .nx-kicker::after,
+.fx-head::before,
+.fs-top::before,
+[data-scene="story"] div:has(> h2)::before,
+[data-scene="friction"] [data-scene-part="copy"]::before,
+[data-scene="surfaces"] [data-scene-part="head"]::before,
+main :is(h2[style*="font-size: clamp(22px, 3vw, 34px)"], .ci-h2, .pf-h2)::before {
+  counter-increment: cv-s;
+  content: "S." counter(cv-s, decimal-leading-zero);
+  display: block; width: max-content;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500; line-height: 1.4;
+  letter-spacing: var(--label-track); text-transform: uppercase; color: var(--color-accent);
+  margin-bottom: 10px;
+}
+/* the hero kicker is one inline row: the label sits at its end */
+.nx-hero .nx-kicker::after { display: inline-block; margin: 0; }
+.nx-hero .nx-secnum { display: none; }
+[data-scene="surfaces"] [data-scene-part="head"]::before { flex: 0 0 100%; margin-bottom: 0; }
+.fs-top::before { margin-bottom: 2px; }
+
+/* ---- header: fixed feel, permanently sticky (never hides on scroll) ------ */
+.nx-header { translate: none !important; }
+.nx-header.cv-hdr-hidden { translate: none !important; }
+
+
+/* ---- page nav: every page, grouped ------------------------------------------
+   Its own full-width row under the brand row. Groups flow left to right with a
+   small label each and wrap as a whole, so all pages stay visible without a
+   horizontal scroll. The groups are not positioned, so the hover pill and the
+   active bar (offsetLeft / offsetTop) still measure against .nex-nav. */
+.nx-header .cv-nav {
+  display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 2px;
+  padding: 8px clamp(14px, 3.2vw, 56px) 10px; border-top: 1px solid var(--color-divider);
+  overflow: visible; -webkit-mask-image: none; mask-image: none;
+}
+.cv-nav-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2px; min-width: 0; }
+.cv-nav-label {
+  flex: 0 0 128px; font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: .16em;
+  color: var(--color-accent); white-space: nowrap; user-select: none;
+}
+.nx-header .cv-nav .nex-nav-item {
+  font-size: 13.5px !important; padding: 5px 9px !important; margin: 0 !important; border-radius: 999px;
+}
+.nx-header .cv-nav .nx-sc, .nx-header .cv-nav .nx-sc::first-letter { text-transform: none; }
+.nx-header .cv-nav .nex-nav-ink { margin-top: -3px; }
+
+/* ---- full-screen menu below 760px ----------------------------------------- */
+.cv-menu-btn { display: none !important; }
+@media (max-width: 760px) {
+  .cv-menu-btn { display: inline-flex !important; margin-left: auto; }
+  .nx-header .nex-nav { display: none !important; }
+  .nx-header.cv-menu-open { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; translate: none !important; }
+  .nx-header.cv-menu-open .nex-nav {
+    display: flex !important; position: fixed; inset: 0; z-index: 450;
+    flex-direction: column; align-items: stretch; gap: 0 !important;
+    overflow-x: hidden !important; overflow-y: auto !important; overscroll-behavior: contain;
+    padding: 88px 16px 40px; background: var(--color-bg);
+    -webkit-mask-image: none !important; mask-image: none !important;
+    animation: cv-menu-in .5s var(--ease-io) both;
+  }
+  .nx-header.cv-menu-open .nex-nav-item {
+    display: flex; align-items: baseline; gap: 12px; width: 100%;
+    margin: 0 !important; padding: 14px 0 !important; text-align: left;
+    border-bottom: 1px solid var(--color-divider) !important;
+    font-family: var(--font-display) !important; font-weight: 700 !important;
+    font-size: clamp(26px, 8vw, 40px) !important; line-height: 1.05; letter-spacing: var(--heading-track) !important;
+    color: var(--color-heading) !important; white-space: normal !important;
+  }
+  .nx-header.cv-menu-open .nex-nav-item .nx-num { font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: var(--label-track); color: var(--color-accent); opacity: 1; vertical-align: 0; }
+  .nx-header.cv-menu-open .nex-nav-item[aria-current="page"] { color: var(--color-accent) !important; }
+  .nx-header.cv-menu-open .nex-nav-pill, .nx-header.cv-menu-open .nex-nav-ink { display: none; }
+  .nx-header.cv-menu-open .cv-nav-group { display: block; }
+  .nx-header.cv-menu-open .cv-nav-label { display: block; padding: 26px 0 6px; font-size: 11px; }
+  .nx-header.cv-menu-open .cv-nav-group:first-of-type .cv-nav-label { padding-top: 0; }
+  .nx-header.cv-menu-open .cv-nav .nex-nav-item { border-radius: 0; }
+  .nx-header.cv-menu-open .cv-menu-btn { position: fixed; top: 20px; right: 16px; z-index: 460; }
+}
+html.cv-menu-open { overflow: hidden; }
+@keyframes cv-menu-in { from { opacity: 0; translate: 0 -12px; } to { opacity: 1; translate: none; } }
+
+/* ---- media: static layout inside frame ---- */
+.fs-mat, .fx-fallback { overflow: hidden; }
+
+
+/* ---- accordions: OPEN / CLOSE ---------------------------------------------- */
+details { interpolate-size: allow-keywords; }
+details > summary { cursor: pointer; list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::after {
+  content: "OPEN"; display: inline-block; margin-left: 12px; vertical-align: .1em;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: var(--label-track);
+  color: var(--color-accent); text-transform: uppercase; text-shadow: none;
+}
+details[open] > summary::after { content: "CLOSE"; }
+details::details-content {
+  block-size: 0; overflow: clip;
+  transition: block-size .5s var(--ease-io), content-visibility .5s var(--ease-io) allow-discrete;
+}
+details[open]::details-content { block-size: auto; }
+
+/* ---- loader: the boot intro's counter ------------------------------------ */
+.cv-loader-count {
+  position: absolute; z-index: 1; right: clamp(16px, 4vw, 48px); bottom: calc(clamp(16px, 4vw, 48px) + 44px);
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(72px, 16vw, 220px); line-height: .8;
+  letter-spacing: var(--display-track); color: var(--color-heading); font-variant-numeric: tabular-nums;
+  pointer-events: none; user-select: none;
+}
+.cv-loader-count::after { content: "%"; color: var(--color-accent); font-size: .32em; vertical-align: .9em; margin-left: .06em; }
+/* never let the intro hold the site: if its scripts stall it steps aside */
+.cv-loader { animation: cv-loader-out .4s 4s forwards; }
+@keyframes cv-loader-out { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+@media (max-width: 520px) { .cv-loader-count { font-size: 64px; } }
+
+/* ---- reduced motion: everything above is still, nothing is hidden -------- */
+@media (prefers-reduced-motion: reduce) {
+  .nx-header, .nx-header.cv-hdr-hidden { translate: none !important; }
+  details::details-content { transition: none; }
+  .fs-mat img { transition: none; }
+}

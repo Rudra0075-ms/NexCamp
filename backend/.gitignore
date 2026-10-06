@@ -1,0 +1,10 @@
+node_modules
+.env
+.env.local
+# Any other environment file (.env.production, .env.staging, …); the checked-in
+# template is the one exception.
+.env.*
+!.env.example
+*.log
+coverage
+.DS_Store

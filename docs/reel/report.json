@@ -1,0 +1,86 @@
+{
+  "url": "http://localhost:4173",
+  "at": "2026-10-01T17:12:49.856Z",
+  "checks": [
+    {
+      "name": "total play time 29.5–30.5 s",
+      "ok": true,
+      "detail": "30.01 s"
+    },
+    {
+      "name": "longest frame < 50 ms",
+      "ok": true,
+      "detail": "33.4 ms, 59.9 fps average, 1797 frames; frames over 34 ms [t, ms]: []"
+    },
+    {
+      "name": "API returns ten scenes",
+      "ok": true
+    },
+    {
+      "name": "hold frames: every number on screen is the API's",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "motion frames: no partial or placeholder number",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "every output card is still for ≥ 0.9 s at the end of its scene",
+      "ok": true,
+      "detail": "11/11"
+    },
+    {
+      "name": "video recorded",
+      "ok": true,
+      "detail": "docs/reel/reel.webm"
+    },
+    {
+      "name": "?lowend=1: no animation while playing",
+      "ok": true,
+      "detail": {
+        "mode": "static",
+        "max": 0,
+        "samples": 301
+      }
+    },
+    {
+      "name": "390 px: no sideways scroll",
+      "ok": true
+    },
+    {
+      "name": "reduced motion: only opacity animates",
+      "ok": true,
+      "detail": {
+        "mode": "reduced",
+        "properties": [
+          "opacity"
+        ]
+      }
+    },
+    {
+      "name": "offline with a cache: the cached copy, with its time",
+      "ok": true,
+      "detail": "Cached copy from 1/10/2026, 17:14:11"
+    },
+    {
+      "name": "offline with no cache: “No data cached”, no figures",
+      "ok": true,
+      "detail": null
+    }
+  ],
+  "playback": {
+    "totalMs": 30012,
+    "frames": 1797,
+    "longestFrameMs": 33.4,
+    "avgFps": 59.9,
+    "over50": 0,
+    "slowFrames": []
+  },
+  "api": {
+    "scenes": 10,
+    "generatedAt": "2026-10-01T17:12:51.271Z",
+    "refetchIdenticalScenes": 10
+  }
+}

@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-ssr
+.vite
+.env
+.env.local
+# Any other environment file (.env.production, .env.staging, …); the checked-in
+# template is the one exception.
+.env.*
+!.env.example
+*.local
+*.log
+npm-debug.log*
+coverage
+.DS_Store

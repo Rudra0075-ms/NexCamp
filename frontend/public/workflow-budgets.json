@@ -1,0 +1,145 @@
+{
+  "generatedAt": "2026-10-01T14:34:27.673Z",
+  "network": {
+    "name": "2G (EDGE)",
+    "kbps": 50,
+    "rttMs": 600,
+    "headerBytes": 700
+  },
+  "assumptions": [
+    "Throughput 50 kbps and 600 ms round trip per request (typical EDGE figures) — ASSUMPTION.",
+    "700 bytes of HTTP headers per request — ASSUMPTION.",
+    "Bodies are measured uncompressed; with gzip on the way the real transfer is smaller.",
+    "The app shell is cached by the service worker after the first visit, so it is not counted here.",
+    "The gate-pass run includes the development OTP echo (a few bytes) that production does not send."
+  ],
+  "workflows": [
+    {
+      "key": "complaint",
+      "label": "File a complaint",
+      "requests": 2,
+      "bytes": 5202,
+      "budget": 12288,
+      "withinBudget": true,
+      "seconds2g": 2.3,
+      "steps": [
+        {
+          "label": "Send the complaint",
+          "method": "POST",
+          "path": "/api/complaints",
+          "up": 165,
+          "down": 3666
+        },
+        {
+          "label": "See it in My requests",
+          "method": "GET",
+          "path": "/api/requests/mine?lite=1",
+          "up": 0,
+          "down": 1371
+        }
+      ]
+    },
+    {
+      "key": "gatepass",
+      "label": "Apply for a gate pass",
+      "requests": 3,
+      "bytes": 12229,
+      "budget": 10240,
+      "withinBudget": false,
+      "seconds2g": 4.1,
+      "steps": [
+        {
+          "label": "Apply",
+          "method": "POST",
+          "path": "/api/gatepass",
+          "up": 127,
+          "down": 1832
+        },
+        {
+          "label": "Guardian code",
+          "method": "POST",
+          "path": "/api/gatepass/:id/verify-otp",
+          "up": 17,
+          "down": 9801
+        },
+        {
+          "label": "Check status",
+          "method": "GET",
+          "path": "/api/gatepass/:id/status",
+          "up": 0,
+          "down": 452
+        }
+      ]
+    },
+    {
+      "key": "certificate",
+      "label": "Request a certificate",
+      "requests": 2,
+      "bytes": 6827,
+      "budget": 8192,
+      "withinBudget": true,
+      "seconds2g": 2.5,
+      "steps": [
+        {
+          "label": "Request bonafide",
+          "method": "POST",
+          "path": "/api/documents",
+          "up": 52,
+          "down": 3915
+        },
+        {
+          "label": "See it in My documents",
+          "method": "GET",
+          "path": "/api/documents?lite=1",
+          "up": 0,
+          "down": 2860
+        }
+      ]
+    },
+    {
+      "key": "notice",
+      "label": "Read a notice",
+      "requests": 2,
+      "bytes": 1397,
+      "budget": 6144,
+      "withinBudget": true,
+      "seconds2g": 1.6,
+      "steps": [
+        {
+          "label": "Notice feed",
+          "method": "GET",
+          "path": "/api/notices/feed?lite=1",
+          "up": 0,
+          "down": 805
+        },
+        {
+          "label": "Mark read",
+          "method": "POST",
+          "path": "/api/notices/:id/read",
+          "up": 2,
+          "down": 590
+        }
+      ]
+    },
+    {
+      "key": "reel",
+      "label": "30-second proof",
+      "requests": 1,
+      "bytes": 4764,
+      "budget": 12288,
+      "withinBudget": true,
+      "seconds2g": 1.5,
+      "steps": [
+        {
+          "label": "All ten scenes",
+          "method": "GET",
+          "path": "/api/xo/reel?lite=1",
+          "up": 0,
+          "down": 4764
+        }
+      ]
+    }
+  ],
+  "method": "MEASURED_BYTES_SIMULATED_2G",
+  "kind": "SIMULATED"
+}
