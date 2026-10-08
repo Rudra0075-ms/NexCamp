@@ -53,6 +53,10 @@ export function createApp() {
     })
   );
 
+  app.get("/", (_req, res) =>
+    res.json({ success: true, message: "NeX Camp API is running", health: "/health" })
+  );
+
   app.get("/health", (_req, res) =>
     res.json({
       success: true,
