@@ -72,3 +72,13 @@ export function createApp() {
 
   return app;
 }
+
+
+// Vercel serverless entrypoint.
+// Vercel invokes the default export as the HTTP handler.
+let vercelApp;
+export default async function handler(req, res) {
+  if (!vercelApp) vercelApp = createApp();
+  if (mongoose.connection.readyState !== 1) await (await import("./config/db.js")).connectDB();
+  return vercelApp(req, res);
+}
