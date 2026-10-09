@@ -1,5 +1,5 @@
 # NeX Camp
-.
+
 **NeX Camp — "Attendance, Mess, Hostel, Repeat: Campus Life, Debugged."** · Team CodexFlow
 
 NeX Camp is a smart-campus system: student complaints become classified reports,
